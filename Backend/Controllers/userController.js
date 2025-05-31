@@ -7,4 +7,6 @@ if(!name || !password){
     next()
 }
 }
+
+
 module.exports = userController

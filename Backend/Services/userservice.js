@@ -1,5 +1,7 @@
 const User = require('../Models/usermodel')
 const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
+const JWT_SECRET = "login123"
 
 const registerUser = async (req,res)=>{
     const {name , password} = req.body
@@ -24,4 +26,34 @@ const registerUser = async (req,res)=>{
 
 }
 
+const loginUser = async (req,res,next)=>{
+
+    try{
+    const {name , password} = req.body
+    const user = await User.findOne({name})
+    if(!user){
+        res.status(500).send("Invalid user or password")
+    }
+    const isMatch = await bcrypt.compare(password , user.password)
+    if(!isMatch){
+        res.status(500).send("Invalid user or password")
+    }
+    const token = jwt.sign({_id:user._id} , JWT_SECRET , {
+        expiresIn : '1h'
+    } )
+
+    console.log("Login Successful")
+    next()
+}
+catch(error) {
+    console.log(error)
+    next()
+    
+}
+
+
+
+}
+
 module.exports = registerUser
+module.exports = loginUser
